@@ -9,7 +9,7 @@ BINARY_NAME=mybinary
 
 CONTRACTS=hello-world
 
-all: contracts
+all:
 
 build: 
 	$(GOBUILD) -o $(BINARY_NAME) -v
@@ -23,9 +23,6 @@ clean:
 run:
 	$(GOBUILD) -o $(BINARY_NAME) -v ./...
 	./$(BINARY_NAME)
-
-contracts:  
-	    @$(foreach CONTRACT,$(CONTRACTS),$(SOLC) -o $(CONTRACT)-target --bin --abi $(CONTRACT).sol;)
 
 deps:
 	$(GOGET) ./...
