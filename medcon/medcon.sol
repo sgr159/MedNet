@@ -14,7 +14,7 @@ contract mortal {
 
 contract medcon is mortal {
 
-	function medcon() {
+	function medcon() public {
 		
 	}
 
@@ -76,7 +76,7 @@ contract medcon is mortal {
 		return users[username].initialized;
 	}
 
-	function getUser(string username, string name, uint password, UserRole role) internal returns (User usr) {
+	function getUser(string username, string name, uint password, UserRole role) internal pure returns (User usr) {
 		User memory u;
 		u.name = name;
 		u.username = username;
@@ -87,28 +87,28 @@ contract medcon is mortal {
 		return u;
 	}
 
-	function getDoctor(string medical_id) internal returns (Doctor doc) {
+	function getDoctor(string medical_id) internal pure returns (Doctor doc) {
 		Doctor memory d;
 		d.medical_id = medical_id;
 		d.initialized = true;
 		return d;
 	}	
 	
-	function getPharma(string pharma_id) internal returns (Pharma ph) {
+	function getPharma(string pharma_id) internal pure returns (Pharma ph) {
 		Pharma memory d;
 		d.pharma_id = pharma_id;
 		d.initialized = true;
 		return d;
 	}	
 	
-	function getPatient() internal returns (Patient pt) {
+	function getPatient() internal pure returns (Patient pt) {
 		Patient memory p;
 		p.initialized = true;
 		p.num_of_prescriptions = 0;
 		return p;
 	}
 
-	function getMedOrder(string med_name, uint dose_per_day, uint no_of_days, string doctor, string diagnosis) internal returns (MedOrder medo){
+	function getMedOrder(string med_name, uint dose_per_day, uint no_of_days, string doctor, string diagnosis) internal pure returns (MedOrder medo){
 		MedOrder memory mo;
 		mo.med_name = med_name;
 		mo.dose_per_day = dose_per_day;
@@ -120,7 +120,7 @@ contract medcon is mortal {
 		return mo;
 	}
 
-	function getPrescription(string doctor) internal returns (Prescription pr) {
+	function getPrescription(string doctor) internal pure returns (Prescription pr) {
 		Prescription memory p;
 		p.doctor = doctor;
 		p.num_of_med_orders = 0;
@@ -129,13 +129,9 @@ contract medcon is mortal {
 		return p;
 	}
 
-	function addMedOrderToPrescription(Prescription p, MedOrder m) internal {
-		p.med_orders[p.num_of_med_orders++] = m;
-	}
-	
-	function addMedOrderToPatient(string patient, string med_name, uint dose_per_day, uint no_of_days, string doctor) public {
-		MedOrder memory md = getMedOrder(med_name, dose_per_day, no_of_days, doctor);
-		Patient memory p = patients[patient];
+	function addMedOrderToPatient(string patient, string med_name, uint dose_per_day, uint no_of_days, string doctor, string diagnosis) public {
+		MedOrder memory md = getMedOrder(med_name, dose_per_day, no_of_days, doctor, diagnosis);
+		Patient storage p = patients[patient];
 		if (p.doctor_index_map[doctor] == 0) {
 			p.doctor_index_map[doctor] = ++p.num_of_prescriptions;
 		}
@@ -144,7 +140,10 @@ contract medcon is mortal {
 			p.prescriptions[p.doctor_index_map[doctor]] = getPrescription(doctor);
 		}
 
-		addMedOrderToPrescription(p.prescriptions[p.doctor_index_map[doctor]], md);
+		Prescription storage pr = p.prescriptions[p.doctor_index_map[doctor]];
+		
+		pr.med_orders[pr.num_of_med_orders++] = md;
+
 	}
 
 	function addDoctor(string username, string name, uint password, string medical_id) public {
