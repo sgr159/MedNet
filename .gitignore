@@ -2,3 +2,5 @@
 MedNet
 server/server
 ins1
+*.swp
+medcon/target

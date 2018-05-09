@@ -1,6 +1,22 @@
 pragma solidity ^0.4.16;
 
-contract medcon {
+contract mortal {
+    /* Define variable owner of the type address */
+    address owner;
+
+    /* This function is executed at initialization and sets the owner of the contract */
+    function mortal() public { owner = msg.sender;  }
+
+    /* Function to recover the funds on the contract */
+    function kill() public { if (msg.sender == owner) selfdestruct(owner);  }
+
+}
+
+contract medcon is mortal {
+
+	function medcon() {
+		
+	}
 
 	enum UserRole {Doctor, Patient, Admin, Pharma}
 
@@ -26,7 +42,8 @@ contract medcon {
 	}
 
 	struct Patient {
-		MedOrder[] med_orders;
+		mapping(uint=>MedOrder) med_orders;
+		uint num_of_med_orders;
 		bool initialized;
 	}
 
@@ -42,16 +59,16 @@ contract medcon {
 		bool initialized;
 	}
 
-	mapping(string => Doctor) public doctors;
-	mapping(string => Patient) public patients;
-	mapping(string => User) public users;
-	mapping(string => Pharma) public pharmas;
+	mapping(string => Doctor) internal doctors;
+	mapping(string => Patient) internal patients;
+	mapping(string => User) internal users;
+	mapping(string => Pharma) internal pharmas;
 
-	function isExistingUser(string username) public returns {
+	function isExistingUser(string username) public view returns (bool res) {
 		return users[username].initialized;
 	}
 
-	function getUser(string username, string name, uint password, UserRole role) public returns (User u) {
+	function getUser(string username, string name, uint password, UserRole role) internal returns (User usr) {
 		User memory u;
 		u.name = name;
 		u.username = username;
@@ -62,24 +79,25 @@ contract medcon {
 		return u;
 	}
 
-	function getDoctor(string medical_id) public returns (Doctor d) {
+	function getDoctor(string medical_id) internal returns (Doctor doc) {
 		Doctor memory d;
 		d.medical_id = medical_id;
 		d.initialized = true;
-		return d
+		return d;
 	}	
 	
-	function getPharma(string pharma_id) public returns (Pharma d) {
+	function getPharma(string pharma_id) internal returns (Pharma ph) {
 		Pharma memory d;
 		d.pharma_id = pharma_id;
 		d.initialized = true;
-		return d
+		return d;
 	}	
 	
-	function getPatient() public returns (Patient d) {
+	function getPatient() internal returns (Patient pt) {
 		Patient memory p;
 		p.initialized = true;
-		return p
+		p.num_of_med_orders = 0;
+		return p;
 	}	
 
 	function addDoctor(string username, string name, uint password, string medical_id) public {
@@ -89,10 +107,10 @@ contract medcon {
 		}
 		
 		users[username] = getUser(name, username, password, UserRole.Doctor);
-		doctors[username] = Doctor(medical_id, 0, true);
+		doctors[username] = getDoctor(medical_id);
 	}
 	
-	function addPatient(string username, string name, string password) public {
+	function addPatient(string username, string name, uint password) public {
 		if (users[username].initialized == true) {
 			//user already exists
 			revert();
@@ -101,7 +119,7 @@ contract medcon {
 		patients[username] = getPatient();
 	}
 	
-	function addPharma(string username, string name, string password, string pharma_id) public {
+	function addPharma(string username, string name, uint password, string pharma_id) public {
 		if (users[username].initialized == true) {
 			//user already exists
 			revert();
