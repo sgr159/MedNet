@@ -31,7 +31,7 @@ contract medcon is mortal {
 
 	struct MedOrder {
 		string med_name;
-		uint med_code;
+		string diagnosis;
 		uint dose_per_day;
 		uint no_of_days;
 		string doctor;
@@ -42,8 +42,16 @@ contract medcon is mortal {
 	}
 
 	struct Patient {
+		mapping(uint=>Prescription) prescriptions;
+		mapping(string=>uint) doctor_index_map;
+		uint num_of_prescriptions;
+		bool initialized;
+	}
+	
+	struct Prescription {
 		mapping(uint=>MedOrder) med_orders;
 		uint num_of_med_orders;
+		string doctor;
 		bool initialized;
 	}
 
@@ -96,9 +104,48 @@ contract medcon is mortal {
 	function getPatient() internal returns (Patient pt) {
 		Patient memory p;
 		p.initialized = true;
-		p.num_of_med_orders = 0;
+		p.num_of_prescriptions = 0;
 		return p;
-	}	
+	}
+
+	function getMedOrder(string med_name, uint dose_per_day, uint no_of_days, string doctor, string diagnosis) internal returns (MedOrder medo){
+		MedOrder memory mo;
+		mo.med_name = med_name;
+		mo.dose_per_day = dose_per_day;
+		mo.no_of_days = no_of_days;
+		mo.doctor = doctor;
+		mo.diagnosis = diagnosis;
+		mo.initialized = true;
+
+		return mo;
+	}
+
+	function getPrescription(string doctor) internal returns (Prescription pr) {
+		Prescription memory p;
+		p.doctor = doctor;
+		p.num_of_med_orders = 0;
+		p.initialized = true;
+
+		return p;
+	}
+
+	function addMedOrderToPrescription(Prescription p, MedOrder m) internal {
+		p.med_orders[p.num_of_med_orders++] = m;
+	}
+	
+	function addMedOrderToPatient(string patient, string med_name, uint dose_per_day, uint no_of_days, string doctor) public {
+		MedOrder memory md = getMedOrder(med_name, dose_per_day, no_of_days, doctor);
+		Patient memory p = patients[patient];
+		if (p.doctor_index_map[doctor] == 0) {
+			p.doctor_index_map[doctor] = ++p.num_of_prescriptions;
+		}
+
+		if (!p.prescriptions[p.doctor_index_map[doctor]].initialized) {
+			p.prescriptions[p.doctor_index_map[doctor]] = getPrescription(doctor);
+		}
+
+		addMedOrderToPrescription(p.prescriptions[p.doctor_index_map[doctor]], md);
+	}
 
 	function addDoctor(string username, string name, uint password, string medical_id) public {
 		if (users[username].initialized == true) {
