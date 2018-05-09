@@ -36,15 +36,23 @@ func main() {
 //
 //	// Commit all pending transactions in the simulator and print the names again
 	token.AddDoctor(auth,"doc1","doc1",123,"id123");
+	token.AddDoctor(auth,"doc2","doc2",123,"id123");
 	token.AddPatient(auth,"krishna","krishna",123);
+	token.AddPharma(auth,"patanjali","patanjali",123,"sad");
+
 	sim.Commit()
 
 	token.AddMedOrderToPatient(auth,"krishna","saridon",2,7,"doc1","headache")
+	token.AddMedOrderToPatient(auth,"krishna","pcm",2,7,"doc1","fever")
+	token.AddMedOrderToPatient(auth,"krishna","weed",2,7,"doc2","depression")
+	sim.Commit()
+
+	token.MarkMedOrderAsMet(auth,"krishna","doc1","patanjali",1)
 	sim.Commit()
 
 	num_pres,_ := token.ShowNumOfPrescriptions(nil,"krishna")
-
-	for i:=uint64(0);i<=num_pres;i++ {
+	fmt.Println("num of pres:",num_pres)
+	for i:=uint64(1);i<=num_pres;i++ {
 		num_med,_ := token.ShowNumOfMedOrdersByIndex(nil,"krishna", i)
 		for j:=uint64(0);j<num_med;j++ {
 			a,b,c,d,e,f,g,h := token.ShowMedOrderByIndex(nil,"krishna",i,j)

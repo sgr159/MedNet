@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>{{.PageTitle}}</title>
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	</head>
+
+	<div class="w3-container w3-margin-top" style="width:80%; display:block; margin:auto">
+		<div class="w3-card-4">
+			<div class="w3-container w3-green">
+				<h2>Signup</h2>
+			</div>
+
+			<form class="w3-container" action="signupReq" method="post">
+				<div>
+				<div class="w3-half">
+					<div style="width:80%">
+						<p>
+						<input class="w3-input" type="text" placeholder="User Name" name="userName">
+					</div>
+				</div>
+				<div class="w3-half">
+					<div style="width:80%">
+						<p>     
+						<input class="w3-input" type="password" placeholder="Password" name="password">
+					</div>
+				</div>
+			</div>
+			<div>
+				<div class="w3-half">
+					<div style="width:80%">
+						<p>
+						<input class="w3-input" type="text" placeholder="Name" name="name">
+					</div>
+				</div>
+				<div class="w3-half">
+					<div style="width:80%">
+						<p>     
+						<select class="w3-select" style="background-color: white" name="role">
+							<option value="" disabled selected hidden>Select Role</option>
+							<option value="1">Patient</option>
+							<option value="2">Doctor</option>
+							<option value="3">Pharma</option>
+							<option value="4">Admin</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div class="w3-margin-top">
+					<div style="width:40%">
+					<p>
+					<input class="w3-input" type="password" placeholder="Medical ID" name="medId">
+					</div>
+				</div>
+			</div>
+
+				<p>
+				<button class="w3-button w3-round w3-green w3-margin-top" style="display:block; margin:auto" type="submit">Login</button>
+				<p>
+
+			</form>
+		</div>
+	</div>
+
+</html>
+

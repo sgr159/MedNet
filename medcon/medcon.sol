@@ -75,6 +75,36 @@ contract medcon is mortal {
 	function isExistingUser(string username) public view returns (bool res) {
 		return users[username].initialized;
 	}
+	
+	function isDoctor(string username) public view returns (bool res) {
+		if(!isExistingUser(username)) {
+			return false;
+		}
+		if (doctors[username].initialized) {
+			return true;
+		}
+		return false;
+	}
+	
+	function isPatient(string username) public view returns (bool res) {
+		if(!isExistingUser(username)) {
+			return false;
+		}
+		if (patients[username].initialized) {
+			return true;
+		}
+		return false;
+	}
+
+	function isPharma(string username) public view returns (bool res) {
+		if(!isExistingUser(username)) {
+			return false;
+		}
+		if (pharmas[username].initialized) {
+			return true;
+		}
+		return false;
+	}
 
 	function getUser(string username, string name, uint64 password, UserRole role) internal pure returns (User usr) {
 		User memory u;
@@ -146,6 +176,25 @@ contract medcon is mortal {
 
 	}
 
+	function markMedOrderAsMet(string patient, string doctor, string pharma, uint64 index) public {
+		Patient storage p = patients[patient];
+		if(!p.initialized) {
+			revert();
+		}
+		Prescription storage pr = p.prescriptions[p.doctor_index_map[doctor]];
+		if(!pr.initialized) {
+			revert();
+		}
+
+		MedOrder storage md = pr.med_orders[index];
+		if(!md.initialized) {
+			revert();
+		}
+
+		md.fulfilled = true;
+		md.pharma = pharma; 
+	}
+
 	function addDoctor(string username, string name, uint64 password, string medical_id) public {
 		if (users[username].initialized == true) {
 			//user already exists
@@ -174,6 +223,13 @@ contract medcon is mortal {
 		pharmas[username] = getPharma(pharma_id);
 	}
 ///////////////////////////////////////////////////////////////////////////////////////////
+
+	function showPatientDetails(string patient) public view returns (string,string) {
+		if(!isPatient(patient)) {
+			revert();
+		}
+		return (users[patient].username, users[patient].name);
+	}
 
 	function showNumOfMedOrdersByDoc(string patient, string doctor) public view returns (uint64) {
 		Patient storage p = patients[patient];
@@ -211,7 +267,7 @@ contract medcon is mortal {
 		if (!p.initialized) {
 			revert();
 		}
-		if (p.num_of_prescriptions > pres) {
+		if (p.num_of_prescriptions < pres) {
 			revert();
 		}
 		Prescription storage pr = p.prescriptions[pres];
