@@ -36,7 +36,20 @@ func main() {
 //
 //	// Commit all pending transactions in the simulator and print the names again
 	token.AddDoctor(auth,"doc1","doc1",big.NewInt(123),"id123");
+	token.AddPatient(auth,"krishna","krishna",big.NewInt(123));
 	sim.Commit()
+
+	token.AddMedOrderToPatient(auth,"krishna","saridon",big.NewInt(2),big.NewInt(7),"doc1","headache")
+	sim.Commit()
+
+	num_pres,err := token.ShowNumOfPrescriptions(nil,"krishna")
+
+	for i:=0;i<=num_pres;i++ {
+		num_med,err := token.ShowNumOfMedOrdersByIndex(nil,"krishna",big.NewInt(i))
+		for j:=0;i<num_pres;j++ {
+			fmt.Println("presc: ",token.ShowMedOrderByIndex(nil,big.NewInt(i),big.NewInt(j)))
+		}
+	}
 
 //	name, _ = token.Name(nil)
 //	fmt.Println("Post-mining name:", name)

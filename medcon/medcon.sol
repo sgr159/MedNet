@@ -173,5 +173,62 @@ contract medcon is mortal {
 		users[username] = getUser(name, username, password, UserRole.Pharma);
 		pharmas[username] = getPharma(pharma_id);
 	}
+///////////////////////////////////////////////////////////////////////////////////////////
 
-} 
+	function showNumOfMedOrdersByDoc(string patient, string doctor) public view returns (uint) {
+		Patient storage p = patients[patient];
+		Prescription storage pr = p.prescriptions[p.doctor_index_map[doctor]];
+		return pr.num_of_med_orders;
+	}
+	
+	function showNumOfMedOrdersByIndex(string patient, uint indx) public view returns (uint) {
+		Patient storage p = patients[patient];
+		if (indx > p.num_of_prescriptions) {
+			revert();
+		}
+		Prescription storage pr = p.prescriptions[indx];
+		return pr.num_of_med_orders;
+	}
+	
+	function showNumOfPrescriptions(string patient) public view returns (uint) {
+		Patient storage p = patients[patient];
+		return p.num_of_prescriptions;
+	}
+
+	function showMedOrderByDoctor(string patient, string doctor, uint index) public view returns (string, string, uint, uint, string, bool, string) {
+		Patient storage p = patients[patient];
+		Prescription storage pr = p.prescriptions[p.doctor_index_map[doctor]];
+		if (index >= pr.num_of_med_orders){
+			revert();
+		}
+		MedOrder storage m = pr.med_orders[index];
+
+		return (m.med_name, m.diagnosis, m.dose_per_day, m.no_of_days, m.doctor, m.fulfilled, m.pharma); 
+	}
+	
+	function showMedOrderByIndex(string patient, uint pres, uint index) public view returns (string, string, uint, uint, string, bool, string) {
+		Patient storage p = patients[patient];
+		if (!p.initialized) {
+			revert();
+		}
+		if (p.num_of_prescriptions > pres) {
+			revert();
+		}
+		Prescription storage pr = p.prescriptions[pres];
+		if (!pr.initialized) {
+			revert();
+		}
+		if (index >= pr.num_of_med_orders){
+			revert();
+		}
+		MedOrder storage m = pr.med_orders[index];
+
+		return (m.med_name, m.diagnosis, m.dose_per_day, m.no_of_days, m.doctor, m.fulfilled, m.pharma); 
+	}
+
+}
+
+
+
+
+
