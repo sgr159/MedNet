@@ -81,10 +81,10 @@ func main() {
 	// Deploy a token contract on the simulated blockchain
 	_, _, token, _ = medcon.DeployMedcon(auth, sim)
 	fmt.Println(token)
-	token.AddDoctor(auth,"doc1","doc1",123,"id123");
-	Doctors = append(Doctors,"doc1")
-	token.AddDoctor(auth,"doc2","doc2",123,"id123");
-	Doctors = append(Doctors,"doc2")
+	token.AddDoctor(auth,"Dr. Rajesh","Dr. Rajesh",123,"id123");
+	Doctors = append(Doctors,"Dr. Rajesh")
+	token.AddDoctor(auth,"Dr. Kripa","Dr. Kripa",123,"id123");
+	Doctors = append(Doctors,"Dr. Kripa")
 	token.AddPatient(auth,"krishna","krishna",123);
 	Patients = append(Patients,"krishna")
 	token.AddPatient(auth,"Shubham","Shubham",123);
@@ -94,9 +94,11 @@ func main() {
 
 	sim.Commit()
 
-	token.AddMedOrderToPatient(auth,"krishna","saridon",2,7,"doc1","headache")
-	token.AddMedOrderToPatient(auth,"krishna","pcm",2,7,"doc1","fever")
-	token.AddMedOrderToPatient(auth,"krishna","ativan",2,7,"doc2","depression")
+	token.AddMedOrderToPatient(auth,"krishna","saridon",2,7,"Dr. Rajesh","headache")
+	token.AddMedOrderToPatient(auth,"krishna","pcm",2,7,"Dr. Rajesh","fever")
+	token.AddMedOrderToPatient(auth,"krishna","ativan",2,7,"Dr. Kripa","depression")
+	token.AddMedOrderToPatient(auth,"krishna","vasicool",2,7,"Dr. Kripa","hear constriction")
+	token.AddMedOrderToPatient(auth,"Shubham","vomistop",2,7,"Dr. Kripa","vommiting")
 	sim.Commit()
 
 	getUserData("krishna")
@@ -137,7 +139,7 @@ func Doctor (w http.ResponseWriter, r *http.Request) {
 
 	Title := "Doctor"
 
-	MyPageVariables := UserPageVariables{Title,getUserData("krishna"),Patients,Doctors,Pharmas,"doc1"}
+	MyPageVariables := UserPageVariables{Title,getUserData("krishna"),Patients,Doctors,Pharmas,"Dr. Rajesh"}
 
 	parsePatientPage("doctor.html",MyPageVariables,w)
 
