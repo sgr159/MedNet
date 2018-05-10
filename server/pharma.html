@@ -34,7 +34,7 @@
   Patient username : {{.UserMedData.UserName}}
   </div>
   <br>
-  <form method="post" action="/patientReq">
+  <form method="post" action="/pharmaReq">
       <select id="mySelect" name="user" onchange="this.form.submit()" style="width:210px">
 	      <option value="" selected disabled>Choose Patient</option>
 
@@ -42,6 +42,12 @@
 <option value="{{$1}}">{{$1}}</option>
   {{end}}
 </select>
+  </form>
+
+<form method="post" action="/pharmafill">
+	<input type="text" name="user" value="{{.UserMedData.UserName}}" hidden/>
+	<button class="w3-button w3-blue w3-round" type="submit">Fill All</button>
+</form>
         
 <!-- <div class="w3-row w3-dark-grey w3-left w3-margin w3-green  w3-card-4">
 Patient username:
@@ -49,30 +55,16 @@ Patient username:
  -->
   <!-- </div> -->
   {{range .UserMedData.Prescriptions}}
-  <div class="w3-row w3-margin-top">
-  <table class="w3-table-all w3-small w3-hoverable w3-card w3-col s3">
-	  <tr>
-		  <th>Doctor Name: {{.Doctor}}</th>
-	  </tr>
-  </table>
-  <table class="w3-table-all w3-small w3-hoverable w3-card w3-col s8">
-	  <tr>
-		  <th>Med Name</th>
-		  <th>Diagnosis</th>
-		  <th>Dosage</th>
-		  <th>Duration</th>
-		  <th>Fullfilled</th>
-	  </tr>
+  <div class="w3-row">
+  <div class="w3-col s3 w3-green w3-center w3-margin w3-green  w3-card-4">
+        <div class="w3-row">Doctor Name</div>
+        <div class="w3-row">{{.Doctor}}</div>
+  </div>
+  <div class="w3-col s8 w3-dark-grey w3-center w3-margin w3-green  w3-card-4">
+        <div class="w3-row"><div class="w3-col s2">Med Name</div><div class="w3-col s2">Diagnosis</div><div class="w3-col s2">Dosage</div><div class="w3-col s2">Duration</div><div class="w3-col s2">Fulfilled</div></div>
         {{range .MedOrders}}
-	<tr>
-		<td>{{.MedName}}</td>
-		<td>{{.Diagnosis}}</td>
-		<td>{{.DosePerDay}}</td>
-		<td>{{.NoOfDays}}</td>
-		<td>{{.Fulfilled}}</td>
-	</tr>
+	<div class="w3-row"><div class="w3-col s2">{{.MedName}}</div><div class="w3-col s2">{{.Diagnosis}}</div><div class="w3-col s2">{{.DosePerDay}}</div><div class="w3-col s2">{{.NoOfDays}}</div><div class="w3-col s2">{{.Fulfilled}}</div> <button  class="w3-button" onclick="myFunction()">Confirm </button> </div>
         {{end}}
-  </table>
   </div>
 </div>
 {{end}}

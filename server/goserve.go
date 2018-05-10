@@ -34,6 +34,7 @@ type MedOrder struct {
 	Doctor string
 	Fulfilled bool
 	Pharma string
+	Index uint64
 }
 
 type Prescription struct {
@@ -54,11 +55,19 @@ type PageVariables struct {
 type UserPageVariables struct {
 	PageTitle string
 	UserMedData UserData
+	Patients []string
+	Doctors []string
+	Pharmas []string
+	SelectedDoctor string
 }
 
 var token * medcon.Medcon
 var auth * bind.TransactOpts
 var sim * backends.SimulatedBackend
+
+var Patients []string
+var Doctors []string
+var Pharmas []string
 
 func main() {
 	// Generate a new random account and a funded simulator
@@ -73,15 +82,21 @@ func main() {
 	_, _, token, _ = medcon.DeployMedcon(auth, sim)
 	fmt.Println(token)
 	token.AddDoctor(auth,"doc1","doc1",123,"id123");
+	Doctors = append(Doctors,"doc1")
 	token.AddDoctor(auth,"doc2","doc2",123,"id123");
+	Doctors = append(Doctors,"doc2")
 	token.AddPatient(auth,"krishna","krishna",123);
-	token.AddPharma(auth,"patanjali","patanjali",123,"sad");
+	Patients = append(Patients,"krishna")
+	token.AddPatient(auth,"Shubham","Shubham",123);
+	Patients = append(Patients,"Shubham")
+	token.AddPharma(auth,"MercyCorps","MercyCorps",123,"sad");
+	Pharmas = append(Pharmas,"MercyCorps")
 
 	sim.Commit()
 
 	token.AddMedOrderToPatient(auth,"krishna","saridon",2,7,"doc1","headache")
 	token.AddMedOrderToPatient(auth,"krishna","pcm",2,7,"doc1","fever")
-	token.AddMedOrderToPatient(auth,"krishna","weed",2,7,"doc2","depression")
+	token.AddMedOrderToPatient(auth,"krishna","ativan",2,7,"doc2","depression")
 	sim.Commit()
 
 	getUserData("krishna")
@@ -90,9 +105,18 @@ func main() {
 	router.HandleFunc("/", Index).Methods("GET")
 	router.HandleFunc("/login", Login).Methods("GET")
 	router.HandleFunc("/patient", Patient).Methods("GET")
+	router.HandleFunc("/patientReq", Patient).Methods("GET")
+	router.HandleFunc("/patientReq", PatientReq).Methods("POST")
+	router.HandleFunc("/doctors", Doctor).Methods("GET")
 //	router.HandleFunc("/loginReq", LoginReq).Methods("POST")
 	router.HandleFunc("/signup", Signup).Methods("GET")
 	router.HandleFunc("/signupReq", SignupReq).Methods("POST")
+	router.HandleFunc("/pharma", Pharma).Methods("GET")
+	router.HandleFunc("/pharmaReq", Pharma).Methods("GET")
+	router.HandleFunc("/pharmaReq", PharmaReq).Methods("POST")
+	router.HandleFunc("/pharmafill", PharmaFill).Methods("POST")
+	router.HandleFunc("/pharmafill", Pharma).Methods("GET")
+//	router.HandleFunc("/docAddReq", DocAddReq).Methods("POST")
 
 	fmt.Println("Server deployed")
 	log.Fatal(http.ListenAndServe(":8080", router))
@@ -109,11 +133,35 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Index: Get request Recieved")
 }
 
+func Doctor (w http.ResponseWriter, r *http.Request) {
+
+	Title := "Doctor"
+
+	MyPageVariables := UserPageVariables{Title,getUserData("krishna"),Patients,Doctors,Pharmas,"doc1"}
+
+	parsePatientPage("doctor.html",MyPageVariables,w)
+
+	fmt.Println("Doctor: Get request Recieved")
+
+}
+
+func Pharma (w http.ResponseWriter, r *http.Request) {
+
+	Title := "Pharma"
+
+	MyPageVariables := UserPageVariables{Title,getUserData("krishna"),Patients,Doctors,Pharmas,""}
+
+	parsePatientPage("pharma.html",MyPageVariables,w)
+
+	fmt.Println("Pharma: Get request Recieved")
+
+}
+
 func Patient (w http.ResponseWriter, r *http.Request) {
 
 	Title := "Login"
 
-	MyPageVariables := UserPageVariables{Title,getUserData("krishna")}
+	MyPageVariables := UserPageVariables{Title,getUserData("krishna"),Patients,Doctors,Pharmas,""}
 
 	parsePatientPage("patient_home.html",MyPageVariables,w)
 
@@ -143,6 +191,58 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	parsePage("Signup.html",MyPageVariables,w)
 
 	fmt.Println("Signup: Get request Recieved")
+}
+
+func PatientReq(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("patient req: POST request Recieved")
+	if r.ContentLength == 0 {
+		fmt.Println("Empty request")
+		return
+	}
+	r.ParseForm()
+	fmt.Println(r)
+	user := r.Form.Get("user")
+	Title := "Patient"
+	MyPageVariables := UserPageVariables{Title,getUserData(user),Patients,Doctors,Pharmas,""}
+
+	parsePatientPage("patient_home.html",MyPageVariables,w)
+
+	fmt.Println("request: ", user)
+}
+
+func PharmaFill(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("pharma fill: POST request Recieved")
+	if r.ContentLength == 0 {
+		fmt.Println("Empty request")
+		return
+	}
+	r.ParseForm()
+	fmt.Println(r)
+	user := r.Form.Get("user")
+	Title := "Pharma"
+	fulfillUser(user,"MercyCorps")
+	MyPageVariables := UserPageVariables{Title,getUserData(user),Patients,Doctors,Pharmas,""}
+
+	parsePatientPage("pharma.html",MyPageVariables,w)
+
+	fmt.Println("request: ", user)
+}
+
+func PharmaReq(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("pharma req: POST request Recieved")
+	if r.ContentLength == 0 {
+		fmt.Println("Empty request")
+		return
+	}
+	r.ParseForm()
+	fmt.Println(r)
+	user := r.Form.Get("user")
+	Title := "Pharma"
+	MyPageVariables := UserPageVariables{Title,getUserData(user),Patients,Doctors,Pharmas,""}
+
+	parsePatientPage("pharma.html",MyPageVariables,w)
+
+	fmt.Println("request: ", user)
 }
 
 func SignupReq(w http.ResponseWriter, r *http.Request) {
@@ -222,7 +322,7 @@ func getUserData (user string) (UserData) {
 		var doctor string
 		for j:=uint64(0);j<num_med;j++ {
 			a,b,c,d,e,f,g,err := token.ShowMedOrderByIndex(nil,user,i,j)
-			mos = append(mos, MedOrder{a,b,c,d,e,f,g})
+			mos = append(mos, MedOrder{a,b,c,d,e,f,g,num_med})
 			fmt.Println("presc: ",a,b,c,d,e,f,g,err)
 			doctor = e
 		}
@@ -230,4 +330,18 @@ func getUserData (user string) (UserData) {
 	}
 	fmt.Println("GetUserData: ", usrData)
 	return usrData
+}
+
+func fulfillUser(user string, pharma string) {
+	num_pres,_ := token.ShowNumOfPrescriptions(nil,user)
+	fmt.Println("num of prescriptions:",num_pres)
+	for i:=uint64(1);i<=num_pres;i++ {
+		num_med,_ := token.ShowNumOfMedOrdersByIndex(nil,user, i)
+		for j:=uint64(0);j<num_med;j++ {
+			a,b,c,d,e,f,g,err := token.ShowMedOrderByIndex(nil,user,i,j)
+			fmt.Println("presc: ",a,b,c,d,e,f,g,err)
+			token.MarkMedOrderAsMet(auth,user,e,pharma,j)
+			sim.Commit()
+		}
+	}
 }

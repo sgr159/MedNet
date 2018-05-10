@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{.PageTitle}}</title>
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body class="w3-white">
+<div class="w3-container">
+  <h1><center>MedNet</center></h1>
+  <p></p>
+  <div class="w3-bar w3-green  w3-card-4">
+    <a href="/" class="w3-bar-item w3-button w3-hover-opacity w3-hover-green">Home</a>
+    <a href="/login" class="w3-bar-item w3-button w3-hover-opacity w3-hover-green">Login</a>
+    <a href="/signup" class="w3-bar-item w3-button w3-hover-opacity w3-hover-green">SignUp</a>
+<!--     <div class="w3-dropdown-hover w3-hover-opacity w3-hover-indigo">
+      <button class="w3-button">Dropdown</button>
+      <div class="w3-dropdown-content w3-card-4">
+        <a href="#" class="w3-bar-item w3-button">Link 1</a>
+        <a href="#" class="w3-bar-item w3-button">Link 2</a>
+        <a href="#" class="w3-bar-item w3-button">Link 3</a>
+      </div> -->
+     <a href="/patient" class="w3-bar-item w3-button w3-hover-opacity w3-hover-green">Patients</a>
+     <a href="/doctors" class="w3-bar-item w3-button w3-hover-opacity w3-hover-green">Doctors</a>
+     <a href="/pharma" class="w3-bar-item w3-button w3-hover-opacity w3-hover-green">Pharmacy</a>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="w3-row w3-dark-grey w3-left w3-margin w3-green  w3-card-4"> -->
+  <div class="w3-row w3-dark-grey w3-left w3-margin w3-green  w3-card-4 w3-padding">
+  Doctor Name: {{.SelectedDoctor}}
+  <br>
+  Doctor username : {{.SelectedDoctor}}
+  </div>
+  <br>
+
+<div class="container" style="float:right">
+  <!-- Trigger the modal with a button -->
+  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add Patient Details</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-sm" style="width:35%;">
+      <div class="modal-content">
+        <div class="modal-header w3-container w3-green" style="height:40px">
+          <button type="button" style="margin-top:3px"class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Patient Input</h4>
+        </div>
+        <div class="modal-body" style="margin-left:55px;">
+			<form action="/action_page.php">
+			  Username: <input placeholder="Username" type="text" name="username" style="margin-left:48px"><br>
+			  Medicine: <input placeholder="Medicine" type="text" name="medicine" style="margin-left:58px"><br>
+			  Dose per day: <input placeholder="Dose per day" type="text" name="dpd" style="margin-left:24px"><br>
+			  Number of Days: <input placeholder="Number of Days" type="text" name="nod" style="margin-left:2px"><br>
+			  Doctor's Name: <input placeholder="Doctor's Name" type="text" name="doctorname" style="margin-left:14px"><br>
+			  Diagnosis: <input placeholder="Diagnosis" type="text" name="diagnosis" style="margin-left:52px"><br>
+			  <input type="submit" value="Submit" style="margin-left:120px; margin-top:5px">
+			</form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="w3-row w3-dark-grey w3-left w3-margin w3-green  w3-card-4">
+Patient username:
+  </div>
+ -->
+  <!-- </div> -->
+  {{$doc := .SelectedDoctor}}
+  {{$user := .UserMedData.UserName}}
+  {{range .UserMedData.Prescriptions}}
+  {{if eq .Doctor $doc}}
+  <div class="w3-row">
+  <div class="w3-col s3 w3-green w3-center w3-margin w3-green  w3-card-4">
+        <div class="w3-row">Patient Name</div>
+        <div class="w3-row">{{$user}}</div>
+  </div>
+  <div class="w3-col s8 w3-dark-grey w3-center w3-margin w3-green  w3-card-4">
+        <div class="w3-row"><div class="w3-col s2">Med Name</div><div class="w3-col s2">Diagnosis</div><div class="w3-col s2">Dosage</div><div class="w3-col s2">Duration</div><div class="w3-col s2">Fulfilled</div></div>
+        {{range .MedOrders}}
+        <div class="w3-row"><div class="w3-col s2">{{.MedName}}</div><div class="w3-col s2">{{.Diagnosis}}</div><div class="w3-col s2">{{.DosePerDay}}</div><div class="w3-col s2">{{.NoOfDays}}</div><div class="w3-col s2">{{.Fulfilled}}</div></div>
+        {{end}}
+  </div>
+</div>
+{{end}}
+{{end}}
+
+
+
+<!-- <div class="w3-container w3-teal">
+   <div class="w3-row">
+  <div class="w3-col s4 w3-teal w3-left w3-margin-left ">
+    Our Address<br>
+    Cisco Sytems, Bengaluru<br>
+    Karnataka -560103<br>
+    India<br>
+    <i class="fa fa-calendar w3-margin" style="font-size:24px"></i>medcorps@cisco.com
+    <br>
+    <i class="fa fa-phone-square w3-margin" style="font-size:24px"></i>112233445566
+  </div>
+  <div class="w3-col s7 w3-teal w3-center w3-margin-right">
+    <p>You can contact us at</p>
+	<form action="/action_page.php">
+  Email: <input type="text" name="fname" class="w3-margin"><br>
+  Query: <input type="text" name="lname" class="w3-margin"><br>
+  <input type="submit" value="Submit">
+	</form>
+  </div>
+</div>
+</div> -->
+</body>
+</html>
